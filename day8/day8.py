@@ -19,6 +19,46 @@ def p1(inpt: str) -> int:
     return cnt
 
 
+def decode_letters2(letters: str) -> dict:
+    words = letters.split()
+    d = {}
+    for word in words:
+        if len(word) == 2:
+            d[1] = frozenset(word)
+        elif len(word) == 3:
+            d[7] = frozenset(word)
+        elif len(word) == 4:
+            d[4] = frozenset(word)
+        elif len(word) == 7:
+            d[8] = frozenset(word)
+
+    for word in words:
+        if len(word) == 6:
+            fword = frozenset(word)
+            if d[7] - fword:
+                # word didn't contain 7, so it's 6
+                d[6] = fword
+            elif not d[4] - fword:
+                # word contained 4, so it's 9
+                d[9] = fword
+            else:
+                d[0] = fword
+
+    # We need to have 6 found for the next part to work, so it's separate loop
+    for word in words:
+        if len(word) == 5:
+            fword = frozenset(word)
+            if not d[1] - fword:
+                # fword contains 1, so it's 3
+                d[3] = fword
+            elif not ((d[8] - d[6]) - fword):
+                # fword contains the c segment, so it's 2
+                d[2] = fword
+            else:
+                d[5] = fword
+    return {v: k for k, v in d.items()}
+
+
 def decode_letters(letters: str) -> dict:
     words = letters.split()
     d = {}
@@ -36,7 +76,6 @@ def decode_letters(letters: str) -> dict:
     for letter in letters:
         letter_count[letter] += 1
     del letter_count[' ']
-    print(letter_count)
 
     segments = {}
     segments['a'] = list(d[7].difference(d[1]))[0]
@@ -83,7 +122,8 @@ def p2(inpt: str) -> int:
     result = 0
     for line in inpt.splitlines():
         letters, output = line.split("|")
-        d = decode_letters(letters)
+        # d = decode_letters(letters)
+        d = decode_letters2(letters)
         result += process_output(output, d)
     return result
 
