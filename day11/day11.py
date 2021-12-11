@@ -22,7 +22,7 @@ def main(inp: str, steps: int, p2_mode: bool) -> int:
     octos = load_octos(inp)
 
     flashes = 0
-    for turn in range(1, steps):
+    for turn in range(steps):
         flash = set()
         for pos in itertools.product(range(10), range(10)):
             octos[pos] += 1
@@ -40,7 +40,7 @@ def main(inp: str, steps: int, p2_mode: bool) -> int:
                 if octos[npos] >= 10:
                     flash.add(npos)
         if p2_mode and flashes_this_turn == 100:
-            return turn
+            return turn+1
         for pos in itertools.product(range(10), range(10)):
             if octos[pos] < 0:
                 octos[pos] = 0
