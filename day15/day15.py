@@ -1,7 +1,7 @@
 # https://adventofcode.com/2021/day/15
-import heapq
 import itertools
 from collections import defaultdict
+from queue import PriorityQueue
 from typing import Tuple
 
 
@@ -15,20 +15,6 @@ class bcolors:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
-
-
-class Heap:
-    def __init__(self):
-        self._store = []
-
-    def push(self, item):
-        heapq.heappush(self._store, item)
-
-    def pop(self):
-        return heapq.heappop(self._store)
-
-    def __bool__(self):
-        return bool(self._store)
 
 
 def neighbors(x: int, y: int) -> Tuple[int, int]:
@@ -79,17 +65,16 @@ def main(inpt: str, p2_mode: bool) -> int:
         for x, y in itertools.product(range(5), range(5)):
             for ix, iy in itertools.product(range(len_x), range(len_y)):
                 cave_map[(ix+x*len_x, iy+y*len_y)] = (cave_map[(ix, iy)] + x + y - 1) % 9 + 1
-                print((ix+x*len_x, iy+y*len_y))
 
         max_x = len_x*5 - 1
         max_y = len_y*5 - 1
 
     end = (max_x, max_y)
-    nav_heap = Heap()
-    nav_heap.push((0, start))
+    nav_queue = PriorityQueue()
+    nav_queue.put((0, start))
 
     while True:
-        cost, pos = nav_heap.pop()
+        cost, pos = nav_queue.get()
         if pos == end:
             print_best_path(cave_map, best_path, end)
             return cost
@@ -100,11 +85,11 @@ def main(inpt: str, p2_mode: bool) -> int:
             if new_cost < travel_cost[neighbor]:
                 best_path[neighbor] = pos
                 travel_cost[neighbor] = new_cost
-                nav_heap.push((new_cost, neighbor))
+                nav_queue.put((new_cost, neighbor))
 
 
 if __name__ == '__main__':
-    with open('example.txt') as infile:
+    with open('input.txt') as infile:
         data = infile.read()
     print('P1: ', main(data, False))
     print('P2: ', main(data, True))
